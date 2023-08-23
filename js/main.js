@@ -1,7 +1,7 @@
 const controle = document.querySelectorAll("[data-controle]");
 const estatisticas = document.querySelectorAll("[data-estatistica]");
 
-const pecas = {
+const modificadoresDeEstatistica = {
     "bracos": {
         "forca": 29,
         "poder": 35,
@@ -36,27 +36,38 @@ const pecas = {
 };
 
 controle.forEach((elemento) => {
-    elemento.addEventListener('click', (evento) => {
-        manipulaDados(evento.target.dataset.controle, evento.target.parentNode)
-        atualizaEstatisticas(evento.target.dataset.peca)
-    })
+    elemento.addEventListener("click", (evento) => {
+        const controle = evento.target.dataset.controle;
+        const peca = evento.target.dataset.peca;
+
+        atualizaEstatistica(controle, peca);
+        atualizaContador(controle, peca);
+    });
 });
 
-function manipulaDados(operacao, controle) {
-    const peca = controle.querySelector("[data-contador]")
+function atualizaContador(controle, peca) {
+    const contador = document.querySelector(`[data-contador="${peca}"]`);
 
-    if (operacao === "-") {
-        peca.value = parseInt(peca.value) - 1
-    } else {
-        peca.value = parseInt(peca.value) + 1
+    if (controle === "-" && contador.value > 0) {
+        contador.value = parseInt(contador.value) - 1;
+    } else if (controle === "+" && contador.value < 99) {
+        contador.value = parseInt(contador.value) + 1;
     }
-};
+}
 
-function atualizaEstatisticas(peca) {
+
+function atualizaEstatistica(controle, peca) {
+    const modificador = modificadoresDeEstatistica[peca];
+    const contador = document.querySelector(`[data-contador="${peca}"]`);
+
     estatisticas.forEach((elemento) => {
-        elemento.textContent = parseInt(elemento.textContent) + pecas[peca][elemento.dataset.estatistica]
+        const tipo = elemento.dataset.estatistica;
+        const valor = elemento.textContent;
+
+        if (controle === "-" && contador.value > 0) {
+            elemento.textContent = parseInt(valor) - modificador[tipo];
+        } else if (controle === "+" && contador.value < 99) {
+            elemento.textContent = parseInt(valor) + modificador[tipo];
+        }
     })
-};
-
-
-
+}
